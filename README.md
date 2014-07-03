@@ -2,6 +2,14 @@
 
 Implements the [decorator pattern](http://en.wikipedia.org/wiki/Decorator_pattern) for clojure protocols.
 
+### Most Recent Release
+
+With Leiningen:
+
+``` clj
+[savagematt/bowen "1.0"]
+```
+
 ### Usage
 
 See [last test](test/bowen/core_test.clj) for detailed usage example
@@ -11,25 +19,6 @@ See [last test](test/bowen/core_test.clj) for detailed usage example
 + Uses `reify`, which isn't very efficient
 + Only works on protocols, not interfaces
 + Will produce completely inscrutable error messages if you get the syntax wrong
-
-
-### The Most Recent Release
-
-With Leiningen:
-
-``` clj
-[savagematt/bowen "1.0"]
-```
-
-With Maven:
-
-``` xml
-<dependency>
-  <groupId>savagematt</groupId>
-  <artifactId>bowen</artifactId>
-  <version>1.0</version>
-</dependency>
-```
 
 ### License
 
