@@ -4,7 +4,7 @@ Implements the [decorator pattern](http://en.wikipedia.org/wiki/Decorator_patter
 
 ### Usage
 
-See [last test](test/bowen/core-test.clj) for detailed usage example
+See [last test](test/bowen/core_test.clj) for detailed usage example
 
 ### Limitations
 
