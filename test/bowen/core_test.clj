@@ -42,32 +42,32 @@
     (echo decorated "echo") => "did you say 'echo'?"
     (goodbye decorated) => "well goodbye I guess"))
 
-(deftype-decorator DefTypeDecorator [to-decorate]
+(deftype-decorator DefTypeDecorator [to-decorate hello-prefix]
   Talky
-  (sayhello [this] (str "*ahem* " (sayhello to-decorate)))
+  (sayhello [this] (str hello-prefix (sayhello to-decorate)))
   (echo [this s] (str "did you say '" s "'?"))
 
   Goodbye
   (goodbye [this] (str "well " (goodbye to-decorate) " I guess")))
 
 (fact "deftype-decorator deftypes a class rather than using reify"
-  (let [decorated (DefTypeDecorator. (Talker.))]
+  (let [decorated (DefTypeDecorator. (Talker.) "*ahem* ")]
 
     (sayhello decorated) => "*ahem* hello"
     (sayhello decorated "world") => "hello world"
     (echo decorated "echo") => "did you say 'echo'?"
     (goodbye decorated) => "well goodbye I guess"))
 
-(defrecord-decorator DefRecordDecorator [to-decorate]
+(defrecord-decorator DefRecordDecorator [to-decorate hello-prefix]
   Talky
-  (sayhello [this] (str "*ahem* " (sayhello to-decorate)))
+  (sayhello [this] (str hello-prefix (sayhello to-decorate)))
   (echo [this s] (str "did you say '" s "'?"))
 
   Goodbye
   (goodbye [this] (str "well " (goodbye to-decorate) " I guess")))
 
 (fact "defrecord-decorator defrecords a class rather than using reify"
-  (let [decorated (DefRecordDecorator. (Talker.))]
+  (let [decorated (DefRecordDecorator. (Talker.) "*ahem* ")]
 
     (sayhello decorated) => "*ahem* hello"
     (sayhello decorated "world") => "hello world"
