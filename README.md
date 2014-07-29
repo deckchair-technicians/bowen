@@ -2,6 +2,8 @@
 
 Implements the [decorator pattern](http://en.wikipedia.org/wiki/Decorator_pattern) for clojure protocols.
 
+You can think of it as middleware for protocols.
+
 When I have a protocol with multiple methods, often I want to wrap an existing implementation,
 overiding some but not all methods, like this:
 
