@@ -27,7 +27,7 @@ overiding some but not all methods, like this:
 Providing explicit implementations of `eat` and `walk-around` is tedious. I want to be able to do this instead:
 
 ```clj
-(deftype-decorated LoudSheep [decorated-sheep]
+(deftype-decorator LoudSheep [decorated-sheep]
    Sheep
    (baa [this] 
       (clojure.string/upper-case (baa decorated-sheep)))
