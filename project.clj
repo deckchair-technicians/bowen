@@ -1,4 +1,4 @@
-(defproject savagematt/bowen "1.1-SNAPSHOT"
+(defproject savagematt/bowen "2.0"
   :description "Implements the decorator pattern for clojure protocols."
 
   :url "http://github.com/savagematt/bowen"
