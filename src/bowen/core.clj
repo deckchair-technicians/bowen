@@ -43,6 +43,18 @@
                               (generate-decorators decorated-symbol (deref (resolve protocol)) overloads)))))
       res)))
 
-(defmacro decorate [decorated & stuff]
-  (let [moo (intertwingle-decorators decorated stuff)]
-    `(reify ~@moo)))
+(defmacro reify-decorator [decorated & opts+specs]
+  (let [full-opts+specs (intertwingle-decorators decorated opts+specs)]
+    `(reify ~@full-opts+specs)))
+
+(defmacro deftype-decorator [type-sym args & opts+specs]
+  (let [decorated (first args)
+        full-opts+specs (intertwingle-decorators decorated opts+specs)]
+    `(deftype ~type-sym ~args
+       ~@full-opts+specs)))
+
+(defmacro defrecord-decorator [type-sym args & opts+specs]
+  (let [decorated (first args)
+        full-opts+specs (intertwingle-decorators decorated opts+specs)]
+    `(defrecord ~type-sym ~args
+       ~@full-opts+specs)))
