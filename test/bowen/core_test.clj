@@ -73,3 +73,22 @@
     (sayhello decorated "world") => "hello world"
     (echo decorated "echo") => "did you say 'echo'?"
     (goodbye decorated) => "well goodbye I guess"))
+
+
+(deftype-decorator TypeHintedDefType [to-decorate ^String hello-prefix]
+  Talky
+  (sayhello [this] (str hello-prefix (sayhello to-decorate))))
+
+(fact "deftype-decorator works with type hints"
+  (let [decorated (TypeHintedDefType. (Talker.) "*ahem* ")]
+
+    (sayhello decorated) => "*ahem* hello"))
+
+(defrecord-decorator TypeHintedDefRecord [to-decorate ^String hello-prefix]
+  Talky
+  (sayhello [this] (str hello-prefix (sayhello to-decorate))))
+
+(fact "defrecord-decorator works with type hints"
+  (let [decorated (TypeHintedDefRecord. (Talker.) "*ahem* ")]
+
+    (sayhello decorated) => "*ahem* hello"))
