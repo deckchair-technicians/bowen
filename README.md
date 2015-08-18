@@ -29,14 +29,15 @@ overiding some but not all methods, like this:
 Providing explicit implementations of `eat` and `walk-around` is tedious. I want to be able to do this instead:
 
 ```clj
-(deftype-decorator LoudSheep [decorated-sheep]
-   Sheep
-   (baa [this] 
-      (clojure.string/upper-case (baa decorated-sheep)))
+(decorate
+   (deftype LoudSheep [decorated-sheep]
+      Sheep
+      (baa [this] 
+         (clojure.string/upper-case (baa decorated-sheep))))
 
 ```
 
-Bowen provides `deftype-decorator`, `defrecord-decorator` and `reify-decorator`, which allow you to do just this.
+Bowen allow you to do this for `defrecord`, `deftype` and `reify`.
 
 ### Most Recent Release
 
@@ -74,18 +75,17 @@ And this type that we want to decorate:
 We can do this:
 
 ```clj
-(deftype-decorator PoliteTalker [decorated-talker]
-              Talky
-              ; Delegate to the decorated instance and add our own behaviour
-              (sayhello [this] (str "*ahem* " (sayhello decorated-talker)))
-
-              ; Don't call the decorated instance at all
-              (echo [this s] 
-                  (str "excuse me, did you say '" s "'?"))
-
-              Goodbye
-              ; Just delegates to decorated-talker
-              )
+(decorate
+   (deftype PoliteTalker [decorated-talker]
+      Talky
+      ; Delegate to the decorated instance and add our own behaviour
+      (sayhello [this] (str "*ahem* " (sayhello decorated-talker)))
+             ; Don't call the decorated instance at all
+      (echo [this s] 
+          (str "excuse me, did you say '" s "'?"))
+             Goodbye
+      ; Just delegates to decorated-talker
+      ))
 
 (let [talker (PoliteTalker. (Talker.)]
      (sayhello talker) 
@@ -100,17 +100,18 @@ We can do this:
               
 ```
 
-`defrecord-decorator` works in the same way.
+Bowen works the same way for `defrecord`.
 
-To use `reify-decorator`, provide the instance to decorate as the first parameter:
+To use `decorate`, around a `reify` form, provide the instance to decorate as the first parameter:
 
 ```clj
 (let [talker (Talker.)]
-(reify-decorator talker
-   Talky
-   (sayhello [this] (str "*ahem* " (talker)))
-
-   Goodbye))
+   (decorate talker
+      (reify 
+         Talky
+         (sayhello [this] (str "*ahem* " (talker)))
+      
+         Goodbye))
 ```
 
 See [core_test.clj](test/bowen/core_test.clj) for detailed usage examples

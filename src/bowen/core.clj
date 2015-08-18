@@ -43,18 +43,45 @@
                               (generate-decorators decorated-symbol (deref (resolve protocol)) overloads)))))
       res)))
 
-(defmacro reify-decorator [decorated & opts+specs]
+(defmacro reify-decorator
+  "It is suggested you use decorate instead"
+  [decorated & opts+specs]
   (let [full-opts+specs (intertwingle-decorators decorated opts+specs)]
     `(reify ~@full-opts+specs)))
 
-(defmacro deftype-decorator [type-sym args & opts+specs]
+(defmacro deftype-decorator
+  "It is suggested you use decorate instead"
+  [type-sym args & opts+specs]
   (let [decorated (first args)
         full-opts+specs (intertwingle-decorators decorated opts+specs)]
     `(deftype ~type-sym ~args
        ~@full-opts+specs)))
 
-(defmacro defrecord-decorator [type-sym args & opts+specs]
+(defmacro defrecord-decorator
+  "It is suggested you use decorate instead"
+  [type-sym args & opts+specs]
   (let [decorated (first args)
         full-opts+specs (intertwingle-decorators decorated opts+specs)]
     `(defrecord ~type-sym ~args
        ~@full-opts+specs)))
+
+(defmacro decorate
+  "Wrap around deftype or defrecord in order to create a type/record which takes a decorated instance as its first
+  constructor argument and delegates calls to any undefined functions.
+
+  Alternatively, use (decorate x (reify SomeProtocol)) to do similar with reify forms"
+  [& forms]
+  (let [decoration-type (if (= 'reify (second (flatten forms)))
+                          :reify
+                          (if (= 'deftype (first (first forms)))
+                            :type
+                            (if (= 'defrecord (first (first forms)))
+                              :record
+                              (throw (UnsupportedOperationException. "Unsupported decorate contents")))))]
+    (case decoration-type
+      :reify
+      `(reify-decorator ~(first forms) ~@(rest (second forms)))
+      :type
+      `(deftype-decorator ~@(rest (first forms)))
+      :record
+      `(defrecord-decorator ~@(rest (first forms))))))
