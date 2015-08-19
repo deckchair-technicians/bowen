@@ -3,28 +3,30 @@
             [bowen.core-test :refer :all]
             [bowen.core :refer :all]))
 
-(fact "expected-sigs works"
+(fact "expected-sigs returns sigs from a protocol in a form we can use later to compare with name and
+       parameter count of provided specs in a deftype, defrecord or reify"
       (expected-sigs Talky)
       => (contains [{:count 1 :name 'sayhello :arglist [(symbol 'this)]}
                     {:count 2 :name 'sayhello :arglist [(symbol 'this) (symbol 'that)]}
                     {:count 2 :name 'echo :arglist [(symbol 'this) (symbol 's)]}]
                    :in-any-order))
 
-(fact "actual-sigs works"
-      (actual-sigs '((sayhello [this] "hello") (sayhello [this that] "hello") (echo [this s] s)))
+(fact "provided-specs returns name and parameter count metadata from opts+specs that we can compare with the output
+       of expected-sigs to see which sigs have not been provided"
+      (provided-specs '((sayhello [this] "hello") (sayhello [this that] "hello") (echo [this s] s)))
       => (contains [{:count 1 :name 'sayhello}
                     {:count 2 :name 'sayhello}
                     {:count 2 :name 'echo}]
                    :in-any-order))
 
-(fact "missing-methods works"
-      (missing-methods Talky '((sayhello [this] "hello")))
+(fact "missing-sigs takes a protocol and an opts+specs form and returns the missing sigs from the protcol"
+      (missing-sigs Talky '((sayhello [this] "hello")))
       => (contains [(contains {:count 2 :name 'sayhello})
                     (contains {:count 2 :name 'echo})]
                    :in-any-order))
 
-(fact "missing-methods works with no overloads"
-      (missing-methods Talky '())
+(fact "missing-sigs works with no provided specs at all"
+      (missing-sigs Talky '())
       => (contains [(contains {:count 1 :name 'sayhello})
                     (contains {:count 2 :name 'sayhello})
                     (contains {:count 2 :name 'echo})]

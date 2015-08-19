@@ -11,16 +11,16 @@
                          :name    name})
                       arglists)))))
 
-(defn actual-sigs [forms]
+(defn provided-specs [forms]
   (map (fn [f]
          {:count (count (second f))
           :name  (first f)})
        forms))
 
-(defn missing-methods [protocol forms]
-  (let [actual (set (actual-sigs forms))]
+(defn missing-sigs [protocol forms]
+  (let [provided (set (provided-specs forms))]
     (filter (fn [expected-sig]
-              (not (actual (dissoc expected-sig :arglist))))
+              (not (provided (dissoc expected-sig :arglist))))
             (expected-sigs protocol))))
 
 (defn is-protocol? [form]
@@ -31,7 +31,7 @@
   (map (fn [missing]
          (list (:name missing) (:arglist missing)
                (concat (list (:name missing) decorated-symbol) (drop 1 (:arglist missing)))))
-       (missing-methods protocol overloads)))
+       (missing-sigs protocol overloads)))
 
 (defn add-decoration [decorated-sym protocols-and-impls]
   (loop [protocols-and-impls protocols-and-impls
@@ -44,7 +44,7 @@
                (doall (concat res
                               [protocol]
                               overloads
-                              (generate-decorators decorated-symbol (deref (resolve protocol)) overloads)))))
+                              (generate-decorators decorated-sym (deref (resolve protocol)) overloads)))))
       res)))
 
 (defmacro reify-decorator
