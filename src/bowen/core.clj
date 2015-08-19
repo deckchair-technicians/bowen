@@ -27,37 +27,53 @@
   (when (symbol? form)
     (#'clojure.core/protocol? (deref (resolve form)))))
 
-(defn generate-decorators [decorated-symbol protocol overloads]
-  (map (fn [missing]
-         (list (:name missing) (:arglist missing)
-               (concat (list (:name missing) decorated-symbol) (drop 1 (:arglist missing)))))
-       (missing-sigs protocol overloads)))
+(defn ->spec [sig & body]
+  (concat (list (:name sig) (:arglist sig))
+          body))
 
-(defn add-decoration [decorated-sym protocols-and-impls]
+(defn ->sig->call-decorated
+  [decorated-sym]
+  (fn [sig]
+    (concat (list (:name sig) decorated-sym) (drop 1 (:arglist sig)))))
+
+(defn add-missing-specs
+  "Given:
+  (defprotocol X
+    (a [this])
+    (b [this)))
+
+  (add-missing-specs (generate-call-to-decorated 'decorated) '(X (a [this] \"a\")))
+
+  Will return:
+
+  '(X
+     (a [this] \"a\")
+     (b [this] (b decorated)))"
+  [sig->spec-body protocols-and-impls]
   (loop [protocols-and-impls protocols-and-impls
-         res []]
-    (if (not (empty? protocols-and-impls))
-      (let [protocol (first protocols-and-impls)
-            overloads (take-while (comp not is-protocol?)
-                                  (next protocols-and-impls))]
-        (recur (drop (+ 1 (count overloads)) protocols-and-impls)
-               (doall (concat res
-                              [protocol]
-                              overloads
-                              (generate-decorators decorated-sym (deref (resolve protocol)) overloads)))))
-      res)))
-
+         result              []]
+    (if (empty? protocols-and-impls)
+      result
+      (let [protocol-sym      (first protocols-and-impls)
+            provided-fn-specs (take-while (comp not is-protocol?)
+                                          (next protocols-and-impls))
+            missing-sigs     (missing-sigs (deref (resolve protocol-sym)) provided-fn-specs)]
+        (recur (drop (+ 1 (count provided-fn-specs)) protocols-and-impls)
+               (doall (concat result
+                              [protocol-sym]
+                              provided-fn-specs
+                              (map #(->spec % (sig->spec-body %)) missing-sigs))))))))
 (defmacro reify-decorator
   "It is suggested you use decorate instead"
   [decorated & opts+specs]
-  (let [full-opts+specs (add-decoration decorated opts+specs)]
+  (let [full-opts+specs (add-missing-specs (->sig->call-decorated decorated) opts+specs)]
     `(reify ~@full-opts+specs)))
 
 (defmacro deftype-decorator
   "It is suggested you use decorate instead"
   [type-sym args & opts+specs]
   (let [decorated       (first args)
-        full-opts+specs (add-decoration decorated opts+specs)]
+        full-opts+specs (add-missing-specs (->sig->call-decorated decorated) opts+specs)]
     `(deftype ~type-sym ~args
        ~@full-opts+specs)))
 
@@ -65,7 +81,7 @@
   "It is suggested you use decorate instead"
   [type-sym args & opts+specs]
   (let [decorated       (first args)
-        full-opts+specs (add-decoration decorated opts+specs)]
+        full-opts+specs (add-missing-specs (->sig->call-decorated decorated) opts+specs)]
     `(defrecord ~type-sym ~args
        ~@full-opts+specs)))
 
