@@ -1,11 +1,15 @@
 (ns bowen.core)
 
 (defn expected-sigs [protocol]
-  (mapcat (fn [sig] (map (fn [arglist] {:count   (count arglist)
-                                        :arglist arglist
-                                        :name    (:name sig)})
-                         (:arglists sig)))
-          (vals (:sigs protocol))))
+  (->> protocol
+       :sigs
+       (vals)
+       (mapcat (fn [{:keys [name arglists]}]
+                 (map (fn [arglist]
+                        {:count   (count arglist)
+                         :arglist arglist
+                         :name    name})
+                      arglists)))))
 
 (defn actual-sigs [forms]
   (map (fn [f]
