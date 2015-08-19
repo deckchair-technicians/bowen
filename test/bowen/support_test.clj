@@ -43,21 +43,21 @@
       => ['Talky])
 
 (fact "intertwingle-decorators works"
-      (intertwingle-decorators 'decorated-symbol ['Talky '(sayhello [this] "hello")])
+      (add-decoration 'decorated-symbol ['Talky '(sayhello [this] "hello")])
       => ['Talky
           '(sayhello [this] "hello")
           '(echo [this s] (echo decorated-symbol s))
           '(sayhello [this that] (sayhello decorated-symbol that))])
 
 (fact "intertwingle-decorators works with no overloads"
-      (intertwingle-decorators 'decorated-symbol ['Talky])
+      (add-decoration 'decorated-symbol ['Talky])
       => ['Talky
           '(echo [this s] (echo decorated-symbol s))
           '(sayhello [this] (sayhello decorated-symbol))
           '(sayhello [this that] (sayhello decorated-symbol that))])
 
 (fact "intertwingle-decorators works with multiple protocols"
-      (intertwingle-decorators 'decorated-symbol ['Talky
+      (add-decoration 'decorated-symbol ['Talky
                                                   '(sayhello [this] "hello")
                                                   'Goodbye
                                                   '(goodbye [this] "overloaded")])
@@ -69,7 +69,7 @@
           '(goodbye [this] "overloaded")])
 
 (fact "intertwingle-decorators works with multiple protocols and no overloads"
-      (intertwingle-decorators 'decorated-symbol ['Talky 'Goodbye])
+      (add-decoration 'decorated-symbol ['Talky 'Goodbye])
       => ['Talky
           '(echo [this s] (echo decorated-symbol s))
           '(sayhello [this] (sayhello decorated-symbol))

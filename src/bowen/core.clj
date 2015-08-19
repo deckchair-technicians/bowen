@@ -33,7 +33,7 @@
                (concat (list (:name missing) decorated-symbol) (drop 1 (:arglist missing)))))
        (missing-methods protocol overloads)))
 
-(defn intertwingle-decorators [decorated-symbol protocols-and-impls]
+(defn add-decoration [decorated-sym protocols-and-impls]
   (loop [protocols-and-impls protocols-and-impls
          res []]
     (if (not (empty? protocols-and-impls))
@@ -50,22 +50,22 @@
 (defmacro reify-decorator
   "It is suggested you use decorate instead"
   [decorated & opts+specs]
-  (let [full-opts+specs (intertwingle-decorators decorated opts+specs)]
+  (let [full-opts+specs (add-decoration decorated opts+specs)]
     `(reify ~@full-opts+specs)))
 
 (defmacro deftype-decorator
   "It is suggested you use decorate instead"
   [type-sym args & opts+specs]
-  (let [decorated (first args)
-        full-opts+specs (intertwingle-decorators decorated opts+specs)]
+  (let [decorated       (first args)
+        full-opts+specs (add-decoration decorated opts+specs)]
     `(deftype ~type-sym ~args
        ~@full-opts+specs)))
 
 (defmacro defrecord-decorator
   "It is suggested you use decorate instead"
   [type-sym args & opts+specs]
-  (let [decorated (first args)
-        full-opts+specs (intertwingle-decorators decorated opts+specs)]
+  (let [decorated       (first args)
+        full-opts+specs (add-decoration decorated opts+specs)]
     `(defrecord ~type-sym ~args
        ~@full-opts+specs)))
 
